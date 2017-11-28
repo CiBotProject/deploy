@@ -105,7 +105,7 @@ app.post("/travis",function(req,res){
 
 // connect the bot to a stream of messages
 var bot = controller.spawn({
-  token: "xoxb-252577468864-EvT7Jzc307J0JqZCZHOGcFoC",
+  token: process.env.SLACK_TOKEN,
 }).startRTM()
 
 //add token
