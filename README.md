@@ -1,1 +1,2 @@
 # cibot
+Updating the docs
