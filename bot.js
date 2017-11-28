@@ -47,6 +47,9 @@ var globals = {
 //start the local webserver
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
 
+app.get("/test", function(req, res){
+  res.send("Test Hello");
+})
 //web server endpoints
 //Travis
 app.post("/travis",function(req,res){
