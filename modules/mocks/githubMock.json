@@ -1,0 +1,26 @@
+{
+    "getRepoContents": {
+        "success": {"statusCode": 200, "message": {}},
+        "failure": {"statusCode": 200, "message": {}}
+    },
+    "getFileSha": {
+        "success": {"statusCode": 200, "message": {}},
+        "failure": {"statusCode": 200, "message": {}}
+    },
+    "createRepoContents": {
+        "success": {"statusCode": 201, "message": {}},
+        "failure": {"statusCode": 404, "message": {}}
+    },
+    "resetRepoContents": {
+        "success": {"statusCode": 201, "message": {}},
+        "failure": {"statusCode": 200, "message": {}}
+    },
+    "checkUserInCollaborators": {
+        "success": {"statusCode": 204,"message":{}},
+        "failure": {"statusCode": 505,"message":{}}
+    },
+    "createGitHubIssue": {
+        "success": {"statusCode": 201, "message": {"id": -2}},
+        "failure": {"statusCode": 505, "message": {}}
+    }
+}

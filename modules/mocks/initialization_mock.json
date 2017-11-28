@@ -1,0 +1,207 @@
+{
+    "contents_with_yamls":
+    [
+        {
+            "type": "file",
+            "size": 625,
+            "name": ".travis.yml",
+            "path": ".travis.yml",
+            "sha": "fff6fe3a23bf1c8ea0692b4a883af99bee26fd3b",
+            "url": "https://api.github.com/repos/octokit/octokit.rb/contents/lib/octokit.rb",
+            "git_url": "https://api.github.com/repos/octokit/octokit.rb/git/blobs/fff6fe3a23bf1c8ea0692b4a883af99bee26fd3b",
+            "html_url": "https://github.com/octokit/octokit.rb/blob/master/lib/octokit.rb",
+            "download_url": "https://raw.githubusercontent.com/octokit/octokit.rb/master/lib/octokit.rb",
+            "_links":
+            {
+                "self": "https://api.github.com/repos/octokit/octokit.rb/contents/lib/octokit.rb",
+                "git": "https://api.github.com/repos/octokit/octokit.rb/git/blobs/fff6fe3a23bf1c8ea0692b4a883af99bee26fd3b",
+                "html": "https://github.com/octokit/octokit.rb/blob/master/lib/octokit.rb"
+            }
+        },
+        {
+            "type": "dir",
+            "size": 0,
+            "name": ".coveralls.yml",
+            "path": ".coveralls.yml",
+            "sha": "a84d88e7554fc1fa21bcbc4efae3c782a70d2b9d",
+            "url": "https://api.github.com/repos/octokit/octokit.rb/contents/lib/octokit",
+            "git_url": "https://api.github.com/repos/octokit/octokit.rb/git/trees/a84d88e7554fc1fa21bcbc4efae3c782a70d2b9d",
+            "html_url": "https://github.com/octokit/octokit.rb/tree/master/lib/octokit",
+            "download_url": null,
+            "_links":
+            {
+                "self": "https://api.github.com/repos/octokit/octokit.rb/contents/lib/octokit",
+                "git": "https://api.github.com/repos/octokit/octokit.rb/git/trees/a84d88e7554fc1fa21bcbc4efae3c782a70d2b9d",
+                "html": "https://github.com/octokit/octokit.rb/tree/master/lib/octokit"
+            }
+        }
+    ],
+
+    "contents_without_yamls":
+    [
+        {
+            "type": "file",
+            "size": 625,
+            "name": "octokit.rb",
+            "path": "lib/octokit.rb",
+            "sha": "fff6fe3a23bf1c8ea0692b4a883af99bee26fd3b",
+            "url": "https://api.github.com/repos/octokit/octokit.rb/contents/lib/octokit.rb",
+            "git_url": "https://api.github.com/repos/octokit/octokit.rb/git/blobs/fff6fe3a23bf1c8ea0692b4a883af99bee26fd3b",
+            "html_url": "https://github.com/octokit/octokit.rb/blob/master/lib/octokit.rb",
+            "download_url": "https://raw.githubusercontent.com/octokit/octokit.rb/master/lib/octokit.rb",
+            "_links":
+            {
+                "self": "https://api.github.com/repos/octokit/octokit.rb/contents/lib/octokit.rb",
+                "git": "https://api.github.com/repos/octokit/octokit.rb/git/blobs/fff6fe3a23bf1c8ea0692b4a883af99bee26fd3b",
+                "html": "https://github.com/octokit/octokit.rb/blob/master/lib/octokit.rb"
+            }
+        },
+        {
+            "type": "dir",
+            "size": 0,
+            "name": "octokit",
+            "path": "lib/octokit",
+            "sha": "a84d88e7554fc1fa21bcbc4efae3c782a70d2b9d",
+            "url": "https://api.github.com/repos/octokit/octokit.rb/contents/lib/octokit",
+            "git_url": "https://api.github.com/repos/octokit/octokit.rb/git/trees/a84d88e7554fc1fa21bcbc4efae3c782a70d2b9d",
+            "html_url": "https://github.com/octokit/octokit.rb/tree/master/lib/octokit",
+            "download_url": null,
+            "_links":
+            {
+                "self": "https://api.github.com/repos/octokit/octokit.rb/contents/lib/octokit",
+                "git": "https://api.github.com/repos/octokit/octokit.rb/git/trees/a84d88e7554fc1fa21bcbc4efae3c782a70d2b9d",
+                "html": "https://github.com/octokit/octokit.rb/tree/master/lib/octokit"
+            }
+        }
+    ],
+
+    "create_travis_file_response":
+    {
+        "content":
+        {
+            "name": ".travis.yml",
+            "path": ".travis.yml",
+            "sha": "95b966ae1c166bd92f8ae7d1c313e738c731dfc3",
+            "size": 9,
+            "url": "https://api.github.com/repos/octocat/Hello-World/contents/notes/hello.txt",
+            "html_url": "https://github.com/octocat/Hello-World/blob/master/notes/hello.txt",
+            "git_url": "https://api.github.com/repos/octocat/Hello-World/git/blobs/95b966ae1c166bd92f8ae7d1c313e738c731dfc3",
+            "download_url": "https://raw.githubusercontent.com/octocat/HelloWorld/master/notes/hello.txt",
+            "type": "file",
+            "_links":
+            {
+                "self": "https://api.github.com/repos/octocat/Hello-World/contents/notes/hello.txt",
+                "git": "https://api.github.com/repos/octocat/Hello-World/git/blobs/95b966ae1c166bd92f8ae7d1c313e738c731dfc3",
+                "html": "https://github.com/octocat/Hello-World/blob/master/notes/hello.txt"
+            }
+        },
+        "commit":
+        {
+            "sha": "7638417db6d59f3c431d3e1f261cc637155684cd",
+            "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/7638417db6d59f3c431d3e1f261cc637155684cd",
+            "html_url": "https://github.com/octocat/Hello-World/git/commit/7638417db6d59f3c431d3e1f261cc637155684cd",
+            "author":
+            {
+                "date": "2014-11-07T22:01:45Z",
+                "name": "Scott Chacon",
+                "email": "schacon@gmail.com"
+            },
+            "committer":
+            {
+                "date": "2014-11-07T22:01:45Z",
+                "name": "Scott Chacon",
+                "email": "schacon@gmail.com"
+            },
+            "message": "[CiBot] Create .travis.yml",
+            "tree":
+            {
+                "url": "https://api.github.com/repos/octocat/Hello-World/git/trees/691272480426f78a0138979dd3ce63b77f706feb",
+                "sha": "691272480426f78a0138979dd3ce63b77f706feb"
+            },
+            "parents":
+            [
+                {
+                    "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/1acc419d4d6a9ce985db7be48c6349a0475975b5",
+                    "html_url": "https://github.com/octocat/Hello-World/git/commit/1acc419d4d6a9ce985db7be48c6349a0475975b5",
+                    "sha": "1acc419d4d6a9ce985db7be48c6349a0475975b5"
+                }
+            ],
+            "verification":
+            {
+                "verified": false,
+                "reason": "unsigned",
+                "signature": null,
+                "payload": null
+            }
+        }
+    },
+
+    "reset_travis_file_response":{},
+
+    "delete_travis_file_response":{},
+
+    "create_coveralls_file_response":
+    {
+        "content":
+        {
+            "name": ".coveralls.yml",
+            "path": ".coveralls.yml",
+            "sha": "95b966ae1c166bd92f8ae7d1c313e738c731dfc3",
+            "size": 9,
+            "url": "https://api.github.com/repos/octocat/Hello-World/contents/notes/hello.txt",
+            "html_url": "https://github.com/octocat/Hello-World/blob/master/notes/hello.txt",
+            "git_url": "https://api.github.com/repos/octocat/Hello-World/git/blobs/95b966ae1c166bd92f8ae7d1c313e738c731dfc3",
+            "download_url": "https://raw.githubusercontent.com/octocat/HelloWorld/master/notes/hello.txt",
+            "type": "file",
+            "_links":
+            {
+                "self": "https://api.github.com/repos/octocat/Hello-World/contents/notes/hello.txt",
+                "git": "https://api.github.com/repos/octocat/Hello-World/git/blobs/95b966ae1c166bd92f8ae7d1c313e738c731dfc3",
+                "html": "https://github.com/octocat/Hello-World/blob/master/notes/hello.txt"
+            }
+        },
+        "commit":
+        {
+            "sha": "7638417db6d59f3c431d3e1f261cc637155684cd",
+            "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/7638417db6d59f3c431d3e1f261cc637155684cd",
+            "html_url": "https://github.com/octocat/Hello-World/git/commit/7638417db6d59f3c431d3e1f261cc637155684cd",
+            "author":
+            {
+                "date": "2014-11-07T22:01:45Z",
+                "name": "Scott Chacon",
+                "email": "schacon@gmail.com"
+            },
+            "committer":
+            {
+                "date": "2014-11-07T22:01:45Z",
+                "name": "Scott Chacon",
+                "email": "schacon@gmail.com"
+            },
+            "message": "[CiBot] Create .coveralls.yml",
+            "tree":
+            {
+                "url": "https://api.github.com/repos/octocat/Hello-World/git/trees/691272480426f78a0138979dd3ce63b77f706feb",
+                "sha": "691272480426f78a0138979dd3ce63b77f706feb"
+            },
+            "parents":
+            [
+                {
+                    "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/1acc419d4d6a9ce985db7be48c6349a0475975b5",
+                    "html_url": "https://github.com/octocat/Hello-World/git/commit/1acc419d4d6a9ce985db7be48c6349a0475975b5",
+                    "sha": "1acc419d4d6a9ce985db7be48c6349a0475975b5"
+                }
+            ],
+            "verification":
+            {
+                "verified": false,
+                "reason": "unsigned",
+                "signature": null,
+                "payload": null
+            }
+        }
+    },
+
+    "reset_coveralls_file_response":{},
+
+    "delete_coveralls_file_response":{}
+}

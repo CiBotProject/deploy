@@ -1,0 +1,13 @@
+{  
+   "created_at":"2017-10-19T13:17:27Z",
+   "url":null,
+   "commit_message":"Travis CI, Coveralls setup",
+   "branch":"master",
+   "committer_name":"samuel",
+   "committer_email":"sgonsal@ncsu.edu",
+   "commit_sha":"27ea21edef73652eb1e72bd9942eea15c1fe4955",
+   "repo_name":"sdg123/SlackBot",
+   "badge_url":"https://s3.amazonaws.com/assets.coveralls.io/badges/coveralls_100.svg",
+   "coverage_change":4.3,
+   "covered_percent":91.0
+}

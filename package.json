@@ -1,0 +1,68 @@
+{
+  "name": "cibot",
+  "version": "1.0.0",
+  "description": "CiBot is a Slack bot created to address three key problems of continuous integration: (1) inaccessibility, (2) rigidity, and (3) decentralized workflow.",
+  "keywords": [],
+  "homepage": "https://github.ncsu.edu/CiBot",
+  "contributors": [
+    {
+      "name": "Andrew McNamara",
+      "email": "ajmcnama@ncsu.edu",
+      "url": "https://github.com/arewm"
+    },
+    {
+      "name": "Igibek Koishybayev",
+      "email": "ikoishy@ncsu.edu",
+      "url": "https://github.com/igibek"
+    },
+    {
+      "name": "Samuel Gonsalves",
+      "email": "sgonsal@ncsu.edu",
+      "url": "https://github.com/sdg123"
+    },
+    {
+      "name": "Sourabh Saha",
+      "email": "sssaha2@ncsu.edu",
+      "url": "https://github.com/sourabhsaha94"
+    },
+    {
+      "name": "Timothy Dement",
+      "email": "tmdement@ncsu.edu",
+      "url": "https://github.com/timothy-dement"
+    }
+  ],
+  "license": "ISC",
+  "main": "bot.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.ncsu.edu/CiBot/bot"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Timothy Dement <tmdement@ncsu.edu>; Samuel Gonsalves <sgonsal@ncsu.edu>; Igibek Koishybayev <ikoishy@ncsu.edu>; Andrew McNamara <ajmcnama@ncsu.edu>; Sourabh Saha <sssaha2@ncsu.edu>",
+  "dependencies": {
+    "async": "^2.6.0",
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.18.2",
+    "botkit": "^0.5.8",
+    "chai": "^4.1.2",
+    "clone": "^2.1.1",
+    "coveralls": "^3.0.0",
+    "data-store": "^1.0.0",
+    "express": "^4.16.2",
+    "istanbul": "^0.4.5",
+    "json2yaml": "1.1.0",
+    "localtunnel": "^1.8.3",
+    "mocha": "^4.0.1",
+    "mocha-lcov-reporter": "^1.3.0",
+    "nock": "^9.1.0",
+    "orchestrate": "^0.8.2",
+    "parse-link-header": "^1.0.1",
+    "querystring": "^0.2.0",
+    "request": "^2.83.0",
+    "slackbots": "^0.5.1",
+    "travis-ci": "^2.1.1",
+    "underscore": "^1.8.3"
+  }
+}

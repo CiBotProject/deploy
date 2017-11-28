@@ -1,0 +1,40 @@
+{
+    "node.js": {
+        "language": "node_js",
+        "node_js": [
+            "stable"
+        ],
+        "after_success": [
+            "npm run coveralls"
+        ],
+        "notifications": {
+            "webhooks": {
+                "urls": [ ],
+                "on_success": "always",
+                "on_failure": "always",
+                "on_cancel": "never",
+                "on_error": "never"
+            }
+        }
+    },
+    "ruby": {
+        "language": "ruby",
+        "rvm": [
+            "2.2",
+            "jruby",
+            "rbx-3"
+        ],
+        "after_success": [
+            "npm run coveralls"
+        ],
+        "notifications": {
+            "webhooks": {
+                "urls": [ ],
+                "on_success": "always",
+                "on_failure": "always",
+                "on_cancel": "never",
+                "on_error": "never"
+            }
+        }
+    }
+}
