@@ -523,7 +523,7 @@ back to the person who delivered the offending commit. '
 					}
 					var message = constants.getMessageStructure();
 					message['status'] = constants.SUCCESS;
-					message['message'] = `Issue created with id ${body.id}. ${assignees}`;
+					message['message'] = `Issue created with number ${body.number}. ${assignees}`;
 					resolve(message);
 				}
 				else

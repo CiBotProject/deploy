@@ -16,8 +16,8 @@ var controller = Botkit.slackbot({
   debug: false
 });
 
-var myUrl = 'https://andrewigibektimsamuelsourabh.localtunnel.me';
-
+var myUrl = 'http://13.85.65.255:3000';
+/*
 var tunnel = localtunnel(3000, { subdomain: 'andrewigibektimsamuelsourabh' },function(err, tun) {
     if (err){
       console.log("\n\n***** TUNNEL ERROR *****\n\n", err);
@@ -33,7 +33,7 @@ var tunnel = localtunnel(3000, { subdomain: 'andrewigibektimsamuelsourabh' },fun
 tunnel.on('close', function() {
     // tunnels are closed
 });
-
+*/
 var tempIssueName = "",tempIssueBody="",tempIssueBreaker="";
 
 slack_data.set("defaultThreshold",95);
