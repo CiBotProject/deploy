@@ -14,8 +14,6 @@ app.use(bodyParser.json());
 
 var controller = Botkit.slackbot({
   debug: false
-  //include "log: false" to disable logging
-  //or a "logLevel" integer from 0 to 7 to adjust logging verbosity
 });
 
 var myUrl = 'https://andrewigibektimsamuelsourabh.localtunnel.me';
@@ -40,24 +38,13 @@ var tempIssueName = "",tempIssueBody="",tempIssueBreaker="";
 
 slack_data.set("defaultThreshold",95);
 
-var globals = {
-  coverageMap:{},//channel:threshold amount
-  repoMap:{},//channel:repo name
-  ownerMap:{},//channel:owner name
-  yamlMap:{},//channel:true/false [check if yaml exisits or not]
-  channelMap:{},//repo: channel name
-  defaultThreshold:95,
-};
+
 //start the local webserver
 app.listen(3000, () => console.log('Example app listening on port 3000'));
 app.get('/test', (req,res) => {res.send('Hello')});
 app.get('/test-repo',(req,res) => {res.send(slack_data.get("SlackBot").channel)});
 //web server endpoints
-//slack
-app.post("/slack/button-input", function(req,res){
-  console.log(req);
-  res.send("ack");
-});
+
 //Travis
 app.post("/travis",function(req,res){
   var payload = req.body.payload;
@@ -65,7 +52,6 @@ app.post("/travis",function(req,res){
   var repositoryName = JSON.parse(payload).repository.name;
   var channel = slack_data.get(repositoryName).channel;
   var status = JSON.parse(payload).state;
-  console.log(commit,repositoryName,channel,status);
 
     if(status==="failed"){
       bot.say({
@@ -156,7 +142,6 @@ controller.hears(['init travis'],['direct_message','direct_mention','mention'],f
       //create default coverageMap entry
       slack_data.set(`${message.channel}.coverage`,slack_data.get("defaultThreshold"));
 
-      console.log(slack_data.get(message.channel),slack_data.get(repoContent[1]));
       //console.log(tokenManager.getToken())
       if(tokenManager.getToken(repoContent[0]) === null){
         bot.reply(message, `Sorry, but token for *${repoContent[0]}* is not found:disappointed:. You can add tokens using the \"*add-token user=token*\" command in a direct message to me. DO NOT send a token where others can see it!`);
@@ -186,12 +171,18 @@ askYamlCreation = function(response,convo){
   convo.ask('Would you like to create a yaml file (yes/no)?',function(response,convo){
     if(response.text.toLowerCase()==="yes"){
       askLanguageToUse(response,convo);
-
-    }else{
+      convo.say("Default coverage threshold for the current repository is set to "+slack_data.get("defaultThreshold")+"%");
+      convo.next();
+    }else if(response.text.toLowerCase()==="no"){
       convo.say("Initialized repository without yaml");
+      convo.say("Default coverage threshold for the current repository is set to "+slack_data.get("defaultThreshold")+"%");
+      convo.next();
     }
-    convo.say("Default coverage threshold for the current repository is set to "+slack_data.get("defaultThreshold")+"%");
-    convo.next();
+    else{
+      convo.say("I consider this response to be a 'no'. I have initialized repository without yaml");
+      convo.say("Default coverage threshold for the current repository is set to "+slack_data.get("defaultThreshold")+"%");
+      convo.next();
+    }
   });
 }
 
@@ -206,12 +197,21 @@ askLanguageToUse = function(response,convo){
         Github.createRepoContents(slack_data.get(response.channel).owner,slack_data.get(response.channel).repo,yamlStatus.data.body,".travis.yml").then(function(res){
           convo.say("Pushed the yaml file to the github repository ");
         }).catch(function(res){
-          convo.say("Error pushing the yaml file to the github repository ");
+
+          var repo = slack_data.get(response.channel).repo;
+
+          convo.say("Error pushing the yaml file to the github repository. Please try and run init travis <owner>/<reponame> ensuring correct details ");
+          slack_data.delete(response.channel);
+          slack_data.delete(repo);
+
         });
     }
     else{
+        var repo = slack_data.get(response.channel).repo;
         convo.say("Error in creating yaml file");
         convo.say("See https://docs.travis-ci.com/user/languages/ to set up your repository.");
+        slack_data.delete(response.channel);
+        slack_data.delete(repo);
     }
     convo.next();
   });
@@ -235,16 +235,12 @@ controller.hears(['configure yaml'],['direct_message','direct_mention','mention'
       //format is owner/repo-name
       var repoContent = repoString.split('/');
 
-      //map channel to repo
-      slack_data.set(`${message.channel}.repo`,repoContent[1]);
-      //map repo to channel
-      slack_data.set(`${repoContent[1]}.channel`,message.channel);
-      //map channel to owner
-      slack_data.set(`${message.channel}.owner`,repoContent[0]);
-      //create default coverageMap entry
-      slack_data.set(`${message.channel}.coverage`,slack_data.get("defaultThreshold"));
-
-      bot.startConversation(message,askLanguageToUse);
+      Travis.activate(repoContent[0],repoContent[1],function(data){
+        bot.reply(message,data.message);
+        if(data.status==='error')
+          return;
+        bot.startConversation(response,askYamlCreation);
+      });
 
     }
     else{
@@ -253,21 +249,6 @@ controller.hears(['configure yaml'],['direct_message','direct_mention','mention'
   }
   else{
     bot.reply(message,helpCommands().configure);
-  }
-});
-//test last build and create issue on failure
-controller.hears(['test last build'],['direct_message','direct_mention','mention'],function(bot,message){
-
-  if(slack_data.get(message.channel)){
-    bot.reply(message,"Please run init travis <owner>/<repository> before testing last build function");
-    return;
-  }
-  else{
-    Travis.lastBuild(slack_data.get(response.channel).owner,slack_data.get(response.channel).repo,function(data){
-      bot.reply(message,data.message);
-      if(data.status==='failure')
-        issueCreationConversation(bot,message,`Build failure`,"");
-    });
   }
 });
 
@@ -284,16 +265,6 @@ controller.hears(['create issue'],['direct_message','direct_mention','mention'],
   }
 });
 
-//test issue change name
-controller.hears(['test change issue'],['direct_message','direct_mention','mention'],function(bot,message){
-  if(!slack_data.get(message.channel)){
-    bot.reply(message,"Please run init travis <owner>/<repository> before testing issue creation");
-  }
-  else{
-    tempIssueName="";
-    issueCreationConversation(bot,message,"BUG");
-  }
-});
 
 
 //setting Coveralls threshold
@@ -335,7 +306,7 @@ controller.hears(['help'],['direct_message','direct_mention','mention'],function
     bot.reply(message,helpCommands().coveralls);
   }
   else {
-    bot.reply(message,"*_help init_*, *_help configure_*, *_help issue_*, *_help change issue_*, *_help coveralls_*");
+    bot.reply(message,"*_help init travis_*, *_help configure yaml_*, *_help issue creation_*");
   }
 });
 
@@ -343,9 +314,7 @@ function helpCommands(){
   return{
     init:"*_init travis <owner>/<repository>_*",
     configure:"*_configure yaml <owner>/<repository>_*",
-    issue:"*_test issue_*",
-    existing_issue:"*_test change issue_*",
-    coveralls:"*_test coveralls_*"
+    issue:"*_create issue_*",
   }
 }
 
@@ -365,22 +334,7 @@ function issueCreationConversation(bot,message,issueTitle){
   bot.startConversation(message,askToCreateIssue);
 }
 //helper functions
-/*askToCreateIssue = function(response,convo){
-  convo.ask('Do you want to create an issue (yes/no)?',function(response,convo){
-    if(response.text.toLowerCase()==="yes"){
-      if(tempIssueName===""){
-        askToCreateNewIssue(response,convo);
-      }
-      else{
-        askToCreateExistingIssue(response,convo);
-      }
-    }
-    else{
-      convo.say("I'll not create the issue");
-    }
-    convo.next();
-  });
-}*/
+
 askToCreateIssue = function(response,convo){
     if(tempIssueName===""){
       askToCreateNewIssue(response,convo);
