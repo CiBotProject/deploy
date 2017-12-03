@@ -196,7 +196,7 @@ controller.hears(['init travis'], ['direct_message', 'direct_mention', 'mention'
               }
 
               // we have successfully initialized the repo, so store the mapping
-              controller.storage.channels.save({
+              var mapping = {
                 'id': message.channel,
                 'owner': owner,
                 'repo': repo,
@@ -206,14 +206,10 @@ controller.hears(['init travis'], ['direct_message', 'direct_mention', 'mention'
                   'title': '',
                   'body': ''
                 }
-              }, function (err) {
-                if (err) {
-                  console.log(err);
-                }
-                else {
-                  bot.startConversation(message, askYamlCreation);
-                }
-              });
+              }
+              saveChannelDataLogError(mapping, 'init travis', function() {
+                bot.startConversation(message, askYamlCreation);
+              })
             });
           });
         }
@@ -379,18 +375,17 @@ function getChannelDataOrPromptForInit(message, location, callback) {
 }
 
 /**
- * 
+ * Save channel data. Log an error message if save fails. Otherwise, execute a desired success function
  * @param {*} data data to save in the data store
  * @param {*} location code location called -- used when logging error
- * @param {*} onSuccess function to call if save succeeds
+ * @param {*} onSuccess function to call if save succeeds (optional)
  */
 function saveChannelDataLogError(data, location, onSuccess) {
-  if (location === undefined) {
-    location = '';
+  if (onSuccess === undefined) {
+    onSuccess = function (){};
   }
-  else {
-    location += ' ';
-  }
+  location += ' ';
+  
   controller.storage.channels.save(data, function (err) {
     if (err) {
       console.log(`Data save ${location}failed.\ndata: ${JSON.stringify(data)}\nerror: ${err}`)
