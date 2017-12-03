@@ -7,8 +7,6 @@ var _ = require('underscore');
 
 var urlRoot = process.env.GITHUB_URL ? process.env.GITHUB_TOKEN : "https://api.github.com";
 
-const mockData = require("./mocks/githubMock.json");
-
 var tokenManager = require('./tokenManager.js');
 const utils = require('./utils')
 const constants = require('./constants.js');
@@ -22,33 +20,25 @@ var issueBodySignature = '\n\nCreated by CiBot!';
  * @param {string} owner the name of the owner of the repository
  * @param {string} repo  the name of the repository whose root contents will be returned
  */
-function getRepoContents(owner, repo)
-{
-	// var myMockData = mockData.getRepoContents.success
-	// var mockMe = nock(urlRoot)
-	// .get(`${urlRoot}/repos/${owner}/${repo}/contents/${file}`)
-	// .reply(myMockData.statusCode, JSON.stringify(myMockData.message));
-	
-    var options =
-    {
-        url: `${urlRoot}/repos/${owner}/${repo}/contents`,
-        method: 'GET',
-        headers:
-        {
-            'User-Agent': 'CiBot',
-            'Content-Type': 'application/json',
-            'Authorization': 'token ' + tokenManager.getToken(owner)
-        }
-    };
+function getRepoContents(owner, repo) {
+	var options =
+		{
+			url: `${urlRoot}/repos/${owner}/${repo}/contents`,
+			method: 'GET',
+			headers:
+				{
+					'User-Agent': 'CiBot',
+					'Content-Type': 'application/json',
+					'Authorization': 'token ' + tokenManager.getToken(owner)
+				}
+		};
 
-    return new Promise(function(resolve, reject)
-    {
-        request(options, function(error, response, body)
-        {
-            var contents = JSON.parse(body);
+	return new Promise(function (resolve, reject) {
+		request(options, function (error, response, body) {
+			var contents = JSON.parse(body);
 			resolve(contents);
-        });
-    });
+		});
+	});
 }
 
 /**
@@ -61,21 +51,19 @@ function getRepoContents(owner, repo)
 function getFileContents(owner, repo, file) {
 
 	var options =
-	{
-		url: `${urlRoot}/repos/${owner}/${repo}/contents/${file}`,
-		method: 'Get',
-		headers:
 		{
-			'User-Agent': 'CiBot',
-			'Content-Type': 'application/json',
-			'Authorization': 'token ' + tokenManager.getToken(owner)
-		}
-	};
+			url: `${urlRoot}/repos/${owner}/${repo}/contents/${file}`,
+			method: 'Get',
+			headers:
+				{
+					'User-Agent': 'CiBot',
+					'Content-Type': 'application/json',
+					'Authorization': 'token ' + tokenManager.getToken(owner)
+				}
+		};
 
-	return new Promise(function(resolve, reject)
-	{
-		request(options, function(error, response, body)
-		{
+	return new Promise(function (resolve, reject) {
+		request(options, function (error, response, body) {
 			var contents = JSON.parse(body);
 			resolve(contents);
 		});
@@ -89,29 +77,31 @@ function getFileContents(owner, repo, file) {
  * @param {string} repo the name of the repository whose root directory contains the file
  * @param {string} file the name of the file whose SHA will be returned
  */
-function getFileSha(owner, repo, file)
-{	
-    var options =
-    {
-        url: `${urlRoot}/repos/${owner}/${repo}/contents/${file}`,
-        method: 'GET',
-        headers:
-        {
-            'User-Agent': 'CiBot',
-            'Content-Type': 'application/json',
-            'Authorization': 'token ' + tokenManager.getToken(owner)
-        }
-    };
+function getFileSha(owner, repo, file) {
+	var options =
+		{
+			url: `${urlRoot}/repos/${owner}/${repo}/contents/${file}`,
+			method: 'GET',
+			headers:
+				{
+					'User-Agent': 'CiBot',
+					'Content-Type': 'application/json',
+					'Authorization': 'token ' + tokenManager.getToken(owner)
+				}
+		};
 
-    return new Promise(function(resolve, reject)
-    {
-        request(options, function(error, response, body)
-        {
-            var contents = JSON.parse(body);
-            var sha = contents.sha.toString();
-            resolve(sha);
-        });
-    });
+	return new Promise(function (resolve, reject) {
+		request(options, function (error, response, body) {
+			var contents = JSON.parse(body);
+			if (contents.sha) {
+				var sha = contents.sha.toString();
+				resolve(sha);
+			}
+			else {
+				resolve('');
+			}
+		});
+	});
 }
 
 /**
@@ -124,46 +114,41 @@ function getFileSha(owner, repo, file)
  * @param {string} content the contents of the file that will be created
  * @param {string} file the name of the file that will be created
  */
-function createRepoContents(owner, repo, content, file)
-{
-    var options =
-    {
-        url: `${urlRoot}/repos/${owner}/${repo}/contents/${file}`,
-        method: 'PUT',
-        headers:
-        {
-            'User-Agent': 'CiBot',
-            'Content-Type': 'application/json',
-            'Authorization': 'token ' + tokenManager.getToken(owner)
-        },
-        json:
-        {
-            'path': file,
-            'message': `[CiBot] Create ${file}`,
-            'content': `${content}`
-        }
-    };
+function createRepoContents(owner, repo, content, file) {
+	var options =
+		{
+			url: `${urlRoot}/repos/${owner}/${repo}/contents/${file}`,
+			method: 'PUT',
+			headers:
+				{
+					'User-Agent': 'CiBot',
+					'Content-Type': 'application/json',
+					'Authorization': 'token ' + tokenManager.getToken(owner)
+				},
+			json:
+				{
+					'path': file,
+					'message': `[CiBot] Create ${file}`,
+					'content': `${content}`
+				}
+		};
 
-    return new Promise(function(resolve, reject)
-    {
-        request(options, function(error, response, body)
-        {
-			if(response.statusCode == '201')
-			{
+	return new Promise(function (resolve, reject) {
+		request(options, function (error, response, body) {
+			if (response.statusCode == '201') {
 				var message = constants.getMessageStructure();
 				message['status'] = constants.SUCCESS;
 				message['message'] = `The ${file} file was successfully created in ${owner}/${repo}`;
 				resolve(message);
 			}
-			else
-			{
+			else {
 				var message = constants.getMessageStructure();
 				message['status'] = constants.FAILURE;
 				message['message'] = `There was a problem creating the ${file} file in ${owner}/${repo}`;
 				reject(message);
 			}
-        });
-    });
+		});
+	});
 }
 
 // createRepoContents('timothy-dement','coveralls-test','# Test Content','.travis.yml')
@@ -186,36 +171,99 @@ function createRepoContents(owner, repo, content, file)
  * @param {*} content the contents of the file that will overwrite the existing contents
  * @param {*} file the name of the file that will be reset
  */
-function resetRepoContents(owner, repo, content, file)
-{
-    getFileSha(owner, repo, file).then(function(data)
-    {
-        var options =
-        {
-            url: `${urlRoot}/repos/${owner}/${repo}/contents/${file}`,
-            method: 'PUT',
-            headers:
-            {
-                'User-Agent': 'CiBot',
-                'Content-Type': 'application/json',
-                'Authorization': 'token ' + tokenManager.getToken(owner)
-            },
-            json:
-            {
-                'message': `[CiBot] Reset ${file}`,
-                'content': `${utils.encodeBase64(content)}`,
-                'sha': `${data}`
-            }
-        };
+function resetRepoContents(owner, repo, content, file) {
+	getFileSha(owner, repo, file).then(function (data) {
+		var options =
+			{
+				url: `${urlRoot}/repos/${owner}/${repo}/contents/${file}`,
+				method: 'PUT',
+				headers:
+					{
+						'User-Agent': 'CiBot',
+						'Content-Type': 'application/json',
+						'Authorization': 'token ' + tokenManager.getToken(owner)
+					},
+				json:
+					{
+						'path': file,
+						'message': `[CiBot] Reset ${file}`,
+						'content': utils.encodeBase64(content),
+						'sha': data
+					}
+			};
 
-        return new Promise(function(resolve, reject)
-        {
-            request(options, function(error, response, body)
-            {
-                resolve(body);
-            });
-        });
-    });
+		return new Promise(function (resolve, reject) {
+			request(options, function (error, response, body) {
+				resolve(body);
+			});
+		});
+	});
+}
+
+/**
+ * Delete a file from a repository
+ * 
+ * @param {*} owner 
+ * @param {*} repo 
+ * @param {*} file 
+ */
+function deleteFile(owner, repo, file) {
+	return getFileSha(owner, repo, file).then(function (data) {
+		var options =
+			{
+				url: `${urlRoot}/repos/${owner}/${repo}/contents/${file}`,
+				method: 'DELETE',
+				headers:
+					{
+						'User-Agent': 'CiBot',
+						'Content-Type': 'application/json',
+						'Authorization': 'token ' + tokenManager.getToken(owner)
+					},
+				json:
+					{
+						'path': file,
+						'message': `[CiBot] Delete ${file}`,
+						'sha': data
+					}
+			}
+
+		return new Promise(function (resolve, reject) {
+			request(options, function (error, response, body) {
+				resolve(body);
+			});
+		});
+	});
+}
+
+/**
+ * Enable issues for a repository
+ * 
+ * @param {*} owner 
+ * @param {*} repo 
+ */
+function enableIssues(owner, repo) {
+	var options =
+		{
+			url: `${urlRoot}/repos/${owner}/${repo}`,
+			method: 'PATCH',
+			headers:
+				{
+					'User-Agent': 'CiBot',
+					'Content-Type': 'application/json',
+					'Authorization': 'token ' + tokenManager.getToken(owner)
+				},
+			json:
+				{
+					'name': repo,
+					'has_issues': true
+				}
+		};
+
+	return new Promise(function (resolve, reject) {
+		request(options, function (error, response, body) {
+			resolve(body);
+		});
+	});
 }
 
 /**
@@ -232,14 +280,12 @@ function resetRepoContents(owner, repo, content, file)
  */
 function insertReadmeBadge(owner, repo, branch, markdownBadge) {
 
-	return getRepoContents(owner, repo).then(function(rootContents)
-	{
+	return getRepoContents(owner, repo).then(function (rootContents) {
 		var rootFileNames = _.pluck(rootContents, 'name');
 
 		if (_.contains(rootFileNames, 'README.md')) {
 
-			return getFileContents(owner, repo, 'README.md').then(function(fileContents)
-			{
+			return getFileContents(owner, repo, 'README.md').then(function (fileContents) {
 				var encodedContents = fileContents.content.replace(/\n/g, '');
 				var decodedContents = utils.decodeBase64(encodedContents);
 
@@ -248,8 +294,7 @@ function insertReadmeBadge(owner, repo, branch, markdownBadge) {
 					decodedContents = markdownBadge + "\n" + decodedContents;
 					resetRepoContents(owner, repo, decodedContents, 'README.md');
 
-					return new Promise(function(resolve, reject)
-					{
+					return new Promise(function (resolve, reject) {
 						var message = constants.getMessageStructure();
 						message['status'] = constants.SUCCESS;
 						message['message'] = `The badge was successfully added to the ${owner}/${repo} README.md file.`;
@@ -258,8 +303,7 @@ function insertReadmeBadge(owner, repo, branch, markdownBadge) {
 
 				} else {
 
-					return new Promise(function(resolve, reject)
-					{
+					return new Promise(function (resolve, reject) {
 						var message = constants.getMessageStructure();
 						message['status'] = constants.FAILURE;
 						message['message'] = `The badge already exists in the ${owner}/${repo} README.md file.`;
@@ -273,8 +317,7 @@ function insertReadmeBadge(owner, repo, branch, markdownBadge) {
 			var encodedBadge = utils.encodeBase64(markdownBadge);
 			createRepoContents(owner, repo, encodedBadge, 'README.md');
 
-			return new Promise(function(resolve, reject)
-			{
+			return new Promise(function (resolve, reject) {
 				var message = constants.getMessageStructure();
 				message['status'] = constants.SUCCESS;
 				message['message'] = `A README.md file was created for ${owner}/${repo} with the given badge.`;
@@ -292,7 +335,7 @@ function insertReadmeBadge(owner, repo, branch, markdownBadge) {
  * @param {*} returns the set parameter or the default value
  */
 function opt(options, name, defaultValue) {
-	if (defaultValue == undefined){
+	if (defaultValue == undefined) {
 		defaultValue = null;
 	}
 	return options && options[name] !== undefined ? options[name] : defaultValue;
@@ -304,7 +347,7 @@ function opt(options, name, defaultValue) {
  * @param {*} owner owner of the repository
  * @param {*} user user to test for membership in collaborators
  */
-function checkUserInCollaborators(repo, owner, user) {	
+function checkUserInCollaborators(repo, owner, user) {
 	var options = {
 		url: `${urlRoot}/repos/${owner}/${repo}/collaborators/${user}`,
 		method: 'GET',
@@ -321,7 +364,7 @@ function checkUserInCollaborators(repo, owner, user) {
 			if (response !== undefined && response.statusCode == 204) {
 				valid = true;
 			}
-			resolve({'valid': valid, 'user':user})
+			resolve({ 'valid': valid, 'user': user })
 		});
 	});
 }
@@ -342,7 +385,7 @@ function checkUserInCollaborators(repo, owner, user) {
  * @returns {json} object specifying the issue to be created
  */
 function createIssueJSON(repo, owner, title, optional) {
-	if (optional == undefined){
+	if (optional == undefined) {
 		optional = {};
 	}
 	var body = opt(optional, 'body', '') + issueBodySignature;
@@ -350,13 +393,13 @@ function createIssueJSON(repo, owner, title, optional) {
 	var breaker = opt(optional, 'breaker', null);
 
 	// Determine if all of the users are valid collaborators for the project
-	var validUserFunction = function(user){
+	var validUserFunction = function (user) {
 		return checkUserInCollaborators(repo, owner, user);
 	}
 	var users = Promise.all(assignees.map(validUserFunction));
 
 	// Once we have the result for all of the users, create the issue with all valid ones as an assignee(s)
-	return users.then(function(users){
+	return users.then(function (users) {
 		var issue = {
 			"repo": repo,	// needed for us not GitHub
 			"owner": owner,	// needed for us not GitHub
@@ -368,18 +411,18 @@ function createIssueJSON(repo, owner, title, optional) {
 				"bug", "CiBot"
 			]
 		}
-		users.forEach(function(user){
-			if (user.valid){
+		users.forEach(function (user) {
+			if (user.valid) {
 				issue.assignees.push(user.user);
 			}
 		})
 		return issue;
-	}).then(function(issue){
-		if (issue.assignees.length === 0){
+	}).then(function (issue) {
+		if (issue.assignees.length === 0) {
 			if (breaker !== null) {
-				if (typeof(breaker) === "string"){
+				if (typeof (breaker) === "string") {
 					// Sanity check to make sure that the breaker is valid
-					return validUserFunction(breaker).then(function(result){
+					return validUserFunction(breaker).then(function (result) {
 						console.log(result)
 						if (result.valid) {
 							issue.fallbackAssignee = true;
@@ -391,9 +434,9 @@ function createIssueJSON(repo, owner, title, optional) {
 				} else {
 					// We have been passed a list of assignees, likely from modifying the issue
 					var breakers = Promise.all(breaker.map(validUserFunction));
-					return breakers.then(function(result){
-						result.forEach(function(user){
-							if (user.valid){
+					return breakers.then(function (result) {
+						result.forEach(function (user) {
+							if (user.valid) {
 								issue.assignees.push(user.user);
 							}
 						})
@@ -421,41 +464,41 @@ function createIssueJSON(repo, owner, title, optional) {
  * @returns {Promise<json>} object specifying the issue to be created
  */
 function modifyIssueJSON(issue, optional) {
-	if (optional == undefined){
+	if (optional == undefined) {
 		optional = {};
 	}
 
 	// Make sure the issue has been finished
-	return issue.then(function(resolvedIssue){
+	return issue.then(function (resolvedIssue) {
 		// Determine what needs to be changed on the issue and change it!
 		var regenerate = false;
-		if (optional.title != undefined){
+		if (optional.title != undefined) {
 			resolvedIssue.title = optional.title;
 		}
-		if (optional.body != undefined){
+		if (optional.body != undefined) {
 			resolvedIssue.body = optional.body + issueBodySignature;
 		}
-		if (optional.assignees != undefined){
+		if (optional.assignees != undefined) {
 			// We have to check all of the assignees, so just regenerate the issue
 			resolvedIssue.assignees = optional.assignees;
 			regenerate = true;
 		}
-		if (optional.repo != undefined || optional.owner != undefined){
+		if (optional.repo != undefined || optional.owner != undefined) {
 			// we have to recheck all of the assignees since we are changing the repo, so just regenerate the issue
 			regenerate = true;
 		}
 
 		// regenerate the issue if necessary
-		if (regenerate){
+		if (regenerate) {
 			var re = new RegExp(issueBodySignature, "g");
 			resolvedIssue.body = resolvedIssue.body.replace(re, '');
 			resolvedIssue.repo = optional.repo == undefined ? resolvedIssue.repo : optional.repo;
 			resolvedIssue.owner = optional.owner == undefined ? resolvedIssue.owner : optional.owner;
 			resolvedIssue.breaker = optional.breaker == undefined ? resolvedIssue.assignees : optional.breaker;
-			return createIssueJSON(resolvedIssue.repo, 
-				resolvedIssue.owner, 
-				resolvedIssue.title, 
-				{'body': resolvedIssue.body, 'assignees':resolvedIssue.assignees, 'breaker':resolvedIssue.breaker});
+			return createIssueJSON(resolvedIssue.repo,
+				resolvedIssue.owner,
+				resolvedIssue.title,
+				{ 'body': resolvedIssue.body, 'assignees': resolvedIssue.assignees, 'breaker': resolvedIssue.breaker });
 		}
 		return resolvedIssue;
 	});
@@ -471,7 +514,7 @@ function modifyIssueJSON(issue, optional) {
 function createGitHubIssue(repo, owner, issuePromise) {
 	// Delete the repo and owner from the issue json before sending to GitHub
 	// but keep track of it to make sure that we have a json file that can be submitted here
-	return issuePromise.then(function(issue){
+	return issuePromise.then(function (issue) {
 		var iRepo = issue.repo;
 		var iOwner = issue.owner;
 		var iAssignees = issue.fallbackAssignee;
@@ -490,35 +533,31 @@ function createGitHubIssue(repo, owner, issuePromise) {
 			json: issue
 		};
 
-		return new Promise(function (resolve, reject) 
-		{
+		return new Promise(function (resolve, reject) {
 			// If we are trying to submit to a repo that the issue was not created for, error out.
-			if (iRepo !== repo || iOwner !== owner){
+			if (iRepo !== repo || iOwner !== owner) {
 				var message = constants.getMessageStructure();
 				message['status'] = constants.FAILURE;
 				message['message'] = 'The issue was created for a different repository than it was submitted to.';
 				reject(message);
 			}
 			// Send a http request to url and specify a callback that will be called upon its return.
-			request(options, function (error, response, body) 
-			{
+			request(options, function (error, response, body) {
 				console.log(options);
-				if(response.statusCode == '201')
-				{
+				if (response.statusCode == '201') {
 					var assignees = ''
 					if (iAssignees) {
 						assignees = 'We could not assign the issue to the people you requested, so we fell \
 back to the person who delivered the offending commit. '
 					}
-					if (issue.assignees.length !== 0){
+					if (issue.assignees.length !== 0) {
 						assignees += 'The issue has been assigned to: '
-						issue.assignees.forEach(function(user){
+						issue.assignees.forEach(function (user) {
 							assignees += `${user}, `;
 						})
 						assignees = assignees.substring(0, assignees.length - 2) + '.'
 					}
-					else
-					{
+					else {
 						assignees += 'We could not assign the issue to anyone.'
 					}
 					var message = constants.getMessageStructure();
@@ -526,8 +565,9 @@ back to the person who delivered the offending commit. '
 					message['message'] = `Issue created with number ${body.number}. ${assignees}`;
 					resolve(message);
 				}
-				else
-				{
+				else {
+					console.log(`GitHub issue generation status code: ${response.statusCode}`)
+					console.log(error)
 					var message = constants.getMessageStructure();
 					message['status'] = constants.FAILURE;
 					message['message'] = 'An error was encountered when trying to create the issue';
@@ -543,33 +583,25 @@ back to the person who delivered the offending commit. '
  * @param {String} repo the repository name for which commit hash is related
  * @param {String} hash the hash of the commit
  */
-function getCommitterLoginWithHash(owner, repo, hash)
-{
-	// var myMockData = mockData.getRepoContents.success
-	// var mockMe = nock(urlRoot)
-	// .get(`${urlRoot}/repos/${owner}/${repo}/contents/${file}`)
-	// .reply(myMockData.statusCode, JSON.stringify(myMockData.message));
-	
-    var options =
-    {
-        url: `${urlRoot}/repos/${owner}/${repo}/commits/${hash}`,
-        method: 'GET',
-        headers:
-        {
-            'User-Agent': 'CiBot',
-            'Content-Type': 'application/json'
-        }
-    };
+function getCommitterLoginWithHash(owner, repo, hash) {
+	var options =
+		{
+			url: `${urlRoot}/repos/${owner}/${repo}/commits/${hash}`,
+			method: 'GET',
+			headers:
+				{
+					'User-Agent': 'CiBot',
+					'Content-Type': 'application/json'
+				}
+		};
 
-    return new Promise(function(resolve, reject)
-    {
-        request(options, function(error, response, body)
-        {
+	return new Promise(function (resolve, reject) {
+		request(options, function (error, response, body) {
 			var contents = JSON.parse(body).committer;
 			console.log(contents);
 			resolve(contents);
-        });
-    });
+		});
+	});
 }
 
 // createGitHubIssue('coveralls-test','timothy-dement',createIssueJSON('coveralls-test','timothy-dement','BUG'))
@@ -608,3 +640,5 @@ exports.modifyIssueJSON = modifyIssueJSON;
 exports.createGitHubIssue = createGitHubIssue;
 exports.insertReadmeBadge = insertReadmeBadge;
 exports.getCommitterLoginWithHash = getCommitterLoginWithHash;
+exports.enableIssues = enableIssues;
+exports.deleteFile = deleteFile;
