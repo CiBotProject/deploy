@@ -25,7 +25,7 @@ var controller = Botkit.slackbot({
 
 var defaultThreshold = 95;
 
-var myUrl = 'http://13.85.65.255:3000';
+var myUrl = 'http://13.85.65.255:4000';
 /*
 var tunnel = localtunnel(3000, { subdomain: 'andrewigibektimsamuelsourabh' },function(err, tun) {
   if (err){
@@ -56,7 +56,7 @@ var bot = controller.spawn({
  * *************************
  */
 // Liveness tests
-app.listen(3000, () => console.log('Example app listening on port 3000'));
+app.listen(4000, () => console.log('Example app listening on port 3000'));
 app.get('/test', (req, res) => { res.send('Hello') });
 // app.get('/test-repo',(req,res) => {res.send(slack_data.get("SlackBot").channel)});
 
