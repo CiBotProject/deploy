@@ -139,7 +139,7 @@ app.post("/travis/:channel", function (req, res) {
  * 
  * TODO: convert this to a team storage
  */
-controller.hears(['add-token'], ['direct_message'], function (bot, message) {
+controller.hears(['^add-token'], ['direct_message'], function (bot, message) {
   console.log(message.text);
   let messageArray = message.text.split(' ');
   if (messageArray.length < 2) {
@@ -157,14 +157,14 @@ controller.hears(['add-token'], ['direct_message'], function (bot, message) {
  * 
  * Start a conversation to reset the repository registered to the channel
  */
-controller.hears(['reset travis'], ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
+controller.hears(['^reset travis'], ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
   bot.startConversation(message, askChannelReset);
 });
 
 /**
  * INITIALIZE REPOSITORY
  */
-controller.hears(['init travis'], ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
+controller.hears(['^init travis'], ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
 
   var messageArray = message.text.split(' ');
   var index = messageArray.indexOf('travis');
@@ -241,7 +241,7 @@ controller.hears(['init travis'], ['direct_message', 'direct_mention', 'mention'
 /**
  * CONFIGURE YAML FILE
  */
-controller.hears(['configure yaml'], ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
+controller.hears(['^configure yaml'], ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
   //start conversation with one user, replies from other users should not affect this conversation
   //TODO: test this functionality by letting a different user reply, expected outcome should be no reply from bot to that user
   var messageArray = message.text.split(' ');
@@ -259,7 +259,7 @@ controller.hears(['configure yaml'], ['direct_message', 'direct_mention', 'menti
  * populated. Otherwise, users will be able to create any issue they want on the registered repo.
  * 
  */
-controller.hears(['create issue'], ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
+controller.hears(['^create issue'], ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
   console.log(message)
   getChannelDataOrPromptForInit(message, 'create issue', function (channel_data) {
     bot.startConversation(message, askToCreateIssue);
@@ -271,7 +271,7 @@ controller.hears(['create issue'], ['direct_message', 'direct_mention', 'mention
  * 
  * Set the coveralls threshold for a repository on a channel
  */
-controller.hears(['set coverage threshold', 'set threshold'], ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
+controller.hears(['^set coverage threshold to', '^set threshold to'], ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
   //TODO add bounds between 0 - 100 as it is percentage
   var messageArray = message.text.split(' ');
   var index = messageArray.indexOf('to');
