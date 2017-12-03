@@ -189,6 +189,13 @@ controller.hears(['init travis'], ['direct_message', 'direct_mention', 'mention'
           // Enable issues before activating Travis
           Github.enableIssues(owner, repo).then(function () {
             Travis.activate(owner, repo, function (data) {
+              bot.reply(message, data.message);
+              if (data.status == constants.ERROR) {
+                console.log(data);
+                return
+              }
+
+              // we have successfully initialized the repo, so store the mapping
               controller.storage.channels.save({
                 'id': message.channel,
                 'owner': owner,
@@ -200,13 +207,10 @@ controller.hears(['init travis'], ['direct_message', 'direct_mention', 'mention'
                   'body': ''
                 }
               }, function (err) {
-                if (err || data.status == constants.ERROR) {
-                  bot.reply(message, data.message);
+                if (err) {
                   console.log(err);
-                  console.log(data);
-                  return
-                } else {
-                  bot.reply(message, data.message);
+                }
+                else {
                   bot.startConversation(message, askYamlCreation);
                 }
               });
