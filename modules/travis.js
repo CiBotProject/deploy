@@ -165,7 +165,7 @@ function createYaml(technology, postUrl, channel){
 
     if(!supportedTechs.hasOwnProperty(technology.toLowerCase())){
         resp.status = constant.FAILURE;
-        resp.message = `Sorry I can't create yaml for ${technology}`;
+        resp.message = `Sorry I can't create yaml for ${technology}\nSee https://docs.travis-ci.com/user/languages/ to set up your repository if you want to use this language.`;
         resp.data = null;
         return resp;
     }
@@ -178,7 +178,7 @@ function createYaml(technology, postUrl, channel){
     let yaml = YAML.stringify( techJson );
     console.log(yaml)
     resp.status = constant.SUCCESS;
-    resp.message = `The content of yaml file for ${technology}`;
+    resp.message = `A yaml file has been created for ${technology}`;
     resp.data.body = utils.encodeBase64(yaml);
 
     return resp;
@@ -205,7 +205,7 @@ function listTechnologies(){
  * @param {String} owner
  * @param {String} repo
  */
-function lastBuild(owner, reponame, callback){
+function lastBuild(owner, reponame, commit_id, callback){
 
     let resp = constant.getMessageStructure();
 
@@ -221,26 +221,34 @@ function lastBuild(owner, reponame, callback){
     }
 
     request(options, function(err, res, body){
-        //console.log(body);
         let json = JSON.parse(body);
 
-        let lastBuildId = json.builds[0].id;
-        let lastBuildState = json.builds[0].state;
-        if(lastBuildState === 'failed'){
-            json.commits.filter(function(path){
-                return path.id === json.builds[0].commit_id;
-            }).forEach(function(path){
-                resp.status = constant.FAILURE;
-                resp.message = `The last build for ${owner}/${reponame} failed`;
-                resp.data.body = path;
-                resp.data.blame.push(path.author_email);
-                callback(resp);
-            });
-        } else if(lastBuildState === 'success'){
+        // console.log(json)
+        // let lastBuildId = json.builds[0].id;
+        console.log(commit_id)
+        let lastBuildResult = json[0].result;
+        if (lastBuildResult === 0){
             resp.status = constant.SUCCESS;
             resp.message = `The last build for ${owner}/${reponame} succeed`;
             callback(resp);
         }
+        else {
+            json.filter(function(path){
+                console.log(path.id)
+                return path.id === commit_id;
+            }).forEach(function(path){
+                resp.status = constant.FAILURE;
+                resp.message = `The last build for ${owner}/${reponame} failed`;
+                resp.data.body = path;
+                // resp.data.blame.push(path.author_email);
+                resp.data.sha.push(path.commit);
+            });
+            callback(resp);
+        }
+        // if(lastBuildState === 'failed'){
+        // } else if(lastBuildState === 'success'){
+            
+        // }
     });
 }
 
