@@ -566,6 +566,8 @@ back to the person who delivered the offending commit. '
 					resolve(message);
 				}
 				else {
+					console.log(`GitHub issue generation status code: ${response.statusCode}`)
+					console.log(error)
 					var message = constants.getMessageStructure();
 					message['status'] = constants.FAILURE;
 					message['message'] = 'An error was encountered when trying to create the issue';

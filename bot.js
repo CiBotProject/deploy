@@ -1,3 +1,4 @@
+var constants = require('./modules/constants')
 var localtunnel = require('localtunnel');
 var Botkit = require('botkit');
 var Coveralls = require('./modules/coveralls');
@@ -25,7 +26,7 @@ var controller = Botkit.slackbot({
 
 var defaultThreshold = 95;
 
-var myUrl = 'http://13.85.65.255:4000';
+var myUrl = 'http://13.85.65.255:3000';
 /*
 var tunnel = localtunnel(3000, { subdomain: 'andrewigibektimsamuelsourabh' },function(err, tun) {
   if (err){
@@ -56,7 +57,7 @@ var bot = controller.spawn({
  * *************************
  */
 // Liveness tests
-app.listen(4000, () => console.log('Example app listening on port 3000'));
+app.listen(3000, () => console.log('Example app listening on port 3000'));
 app.get('/test', (req, res) => { res.send('Hello') });
 // app.get('/test-repo',(req,res) => {res.send(slack_data.get("SlackBot").channel)});
 
@@ -180,19 +181,9 @@ controller.hears(['init travis'], ['direct_message', 'direct_mention', 'mention'
         //if repo name is provided
         if (repoString !== null) {
           //format is owner/repo-name
-          var repoContent = repoString.split('/');
-
-          controller.storage.channels.save({
-            'id': message.channel,
-            'repo': repoContent[1],
-            'owner': repoContent[0],
-            'coverage': defaultThreshold,
-            'issue': {
-              'breaker': '',
-              'title': '',
-              'body': ''
-            }
-          });
+          let repoContent = repoString.split('/');
+          let owner = repoContent[0];
+          let repo = repoContent[1];
 
           //console.log(tokenManager.getToken())
           if (tokenManager.getToken(repoContent[0]) === null) {
@@ -201,12 +192,28 @@ controller.hears(['init travis'], ['direct_message', 'direct_mention', 'mention'
           }
 
           // Enable issues before activating Travis
-          Github.enableIssues(repoContent[0], repoContent[1]).then(function () {
-            Travis.activate(repoContent[0], repoContent[1], function (data) {
-              bot.reply(message, data.message);
-              if (data.status === 'error')
-                return;
-              bot.startConversation(message, askYamlCreation);
+          Github.enableIssues(owner, repo).then(function () {
+            Travis.activate(owner, repo, function (data) {
+              controller.storage.channels.save({
+                'id': message.channel,
+                'owner': owner,
+                'repo': repo,
+                'coverage': defaultThreshold,
+                'issue': {
+                  'breaker': '',
+                  'title': '',
+                  'body': ''
+                }
+              }, function (err) {
+                if (err || data.status == constants.ERROR) {
+                  console.log(err);
+                  console.log(data);
+                  return
+                } else {
+                  bot.reply(message, data.message);
+                  bot.startConversation(message, askYamlCreation);
+                }
+              });
             });
           });
         }
@@ -264,7 +271,7 @@ controller.hears(['set coverage threshold', 'set threshold'], ['direct_message',
   getChannelDataOrPromptForInit(message, 'set threshold', function (channel_data) {
     if ((index + 1) < messageArray.length) {
       channel_data.coverage = parseInt(messageArray[index + 1]);
-      getChannelDataOrPromptForInit(message, 'set threshold', function(channel_data) {
+      getChannelDataOrPromptForInit(message, 'set threshold', function (channel_data) {
         controller.storage.channels.save(channel_data, function (err) {
           if (err) {
             bot.reply(message, 'There was an error changing the coverage');
@@ -373,10 +380,11 @@ function getChannelDataOrPromptForInit(message, location, callback) {
 
 /**
  * 
- * @param {*} data 
- * @param {*} location 
+ * @param {*} data data to save in the data store
+ * @param {*} location code location called -- used when logging error
+ * @param {*} onSuccess function to call if save succeeds
  */
-function saveChannelDataLogError(data, location) {
+function saveChannelDataLogError(data, location, onSuccess) {
   if (location === undefined) {
     location = '';
   }
@@ -386,6 +394,11 @@ function saveChannelDataLogError(data, location) {
   controller.storage.channels.save(data, function (err) {
     if (err) {
       console.log(`Data save ${location}failed.\ndata: ${JSON.stringify(data)}\nerror: ${err}`)
+    }
+    else {
+      if (onSuccess) {
+        onSuccess();
+      }
     }
   })
 }
@@ -531,11 +544,12 @@ function askToCreateNewIssue(response, convo) {
   getChannelDataOrPromptForInit(convo.source_message, 'askToCreateNewIssue', function (channel_data) {
     convo.ask('Please enter the name of the issue', function (response, convo) {
       channel_data.issue.title = response.text;
-      saveChannelDataLogError(channel_data, 'askToCreateNewIssue')
+      saveChannelDataLogError(channel_data, 'askToCreateNewIssue', function () {
 
-      convo.say(`I'm creating an issue titled *${channel_data.issue.title}*`);
-      askToAssignPeople(response, convo);
-      convo.next();
+        convo.say(`I'm creating an issue titled *${channel_data.issue.title}*`);
+        askToAssignPeople(response, convo);
+        convo.next();
+      })
     });
   })
 }
@@ -556,18 +570,18 @@ function askToCreateExistingIssue(response, convo) {
     else if (name.includes("Build")) {
       channel_data.issue.body = "Build failure";
     }
-    saveChannelDataLogError(channel_data, 'askToCreateExistingIssue');
+    saveChannelDataLogError(channel_data, 'askToCreateExistingIssue', function () {
 
-    convo.ask(`Current issue title is set to *${name}*. Do you want to change the title of the issue (yes/no)?`, function (response, convo) {
-      if (response.text.toLowerCase() === "yes") {
-        askToCreateNewIssue(response, convo);
-      }
-      else {
-        askToAssignPeople(response, convo);
-      }
-      convo.next();
+      convo.ask(`Current issue title is set to *${name}*. Do you want to change the title of the issue (yes/no)?`, function (response, convo) {
+        if (response.text.toLowerCase() === "yes") {
+          askToCreateNewIssue(response, convo);
+        }
+        else {
+          askToAssignPeople(response, convo);
+        }
+        convo.next();
+      });
     });
-
   })
 }
 
@@ -586,7 +600,7 @@ function askToAssignPeople(response, convo) {
       let listOfassignees = listOutput.split(",").map(function (item) {
         return item.trim();
       });;
-      let issueName = channel_data.issue.title
+      var issueName = channel_data.issue.title
 
       convo.say(`I am going to create an issue titled *${issueName}* and assign it to ` + listOutput);
 
@@ -616,8 +630,9 @@ function askToAssignPeople(response, convo) {
       channel_data.issue.title = '';
       channel_data.issue.body = '';
       channel_data.issue.breaker = '';
-      saveChannelDataLogError(channel_data, 'askToAssignPeople');
-      convo.next();
+      saveChannelDataLogError(channel_data, 'askToAssignPeople', function () {
+        convo.next();
+      });
     });
   })
 }
