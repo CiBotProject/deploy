@@ -43,6 +43,7 @@ function activate(owner, reponame, callback){
                     resp.status = constant.ERROR;
                     resp.message = `Error occured when tried to activate travis for ${owner}/${reponame}:scream:`;
                     resp.data.body = err;
+                    console.log(err)
                     callback(resp);
                     return;
                 }
@@ -85,11 +86,81 @@ function activate(owner, reponame, callback){
 }
 
 /**
+ * This function:
+ * 1. synchronize Travis with Github repositories
+ * 2. Activate travis CI for the specified repository with owner
+ * @param {String} owner //github owner of repo
+ * @param {String} reponame //github repo name
+ */
+function deactivate(owner, reponame, callback){
+    var resp = constant.getMessageStructure();
+    try{
+        authenticate(owner, function(){
+            let options = {
+                url: `${urlRoot}/repos/${owner}/${reponame}`,
+                method: 'GET',
+                headers:
+                {
+                    'User-Agent': userAgent,
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                }
+            }
+
+            console.log(options);
+
+            request(options, function(err, res, body){
+                if(err) {
+                    resp.status = constant.ERROR;
+                    resp.message = `Error occured when tried to deactivate travis for ${owner}/${reponame}:scream:`;
+                    resp.data.body = err;
+                    callback(resp);
+                    return;
+                }
+                try{
+                    body = JSON.parse(body);
+                }
+                catch(e){
+                    resp.status = constant.ERROR;
+                    resp.message = `Error occured when tried to deactivate travis for ${owner}/${reponame}:scream:. Travis-ci.org returns: ${body}`;
+                    resp.data.body = e;
+                    callback(resp);
+                    return;
+                }
+
+
+                options.url = `${urlRoot}/hooks`;
+                options.method = "PUT";
+                options.json = {
+                    hook:{
+                        id:body.id,
+                        active:false
+                    }
+                }
+
+                request(options, function(err, res, body){
+
+                    resp.status = constant.SUCCESS;
+                    resp.message = `Travis deactivated for ${owner}/${reponame}`;
+                    resp.data.body = body;
+                    callback(resp);
+                });
+            });
+        });
+    } catch(e){
+        resp.status = constant.ERROR;
+        resp.message = `Error occured when tried to deactivate travis for ${owner}/${reponame}:scream:`;
+        resp.data.body = e;
+        callback(resp);
+    }
+}
+/**
  * This function returns yaml file body for specified technology
  * @param {String} technology
  * @param {String} postUrl URL to post build notifications to
+ * @param {String} channel Channel id to return POST requests to
  */
-function createYaml(technology, postUrl,owner,repo){
+function createYaml(technology, postUrl, channel){
     let resp = constant.getMessageStructure();
 
     if(!supportedTechs.hasOwnProperty(technology.toLowerCase())){
@@ -101,7 +172,7 @@ function createYaml(technology, postUrl,owner,repo){
     let techJson = clone(supportedTechs[technology.toLocaleLowerCase()]);
 
     if (postUrl !== undefined){
-        techJson.notifications.webhooks.urls.push(`${postUrl}/travis`);
+        techJson.notifications.webhooks.urls.push(`${postUrl}/travis/${channel}`);
     }
 
     let yaml = YAML.stringify( techJson );
@@ -208,9 +279,11 @@ function authenticate(user, callback){
 }
 
 module.exports.activate = activate;//activates travis for repo. Params: owner, reponame, callback
+module.exports.deactivate = deactivate;//deactivates the travis for repo. Params: owner, reponame, callback
 module.exports.lastBuild = lastBuild;//returns last build state. Params: owner, reponame, callback
 module.exports.createYaml = createYaml;//create the yaml for specified technology. Params: technology
 module.exports.listTechnologies = listTechnologies;//list supported technologies. No params.
+
 module.exports.badge = badge;
 module.exports.travisToken = authenticate;
 function listAccounts(){
