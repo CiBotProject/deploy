@@ -136,11 +136,6 @@ controller.hears(['add-token'], ['direct_message'], function (bot, message) {
   }
   messageArray = messageArray[1].split('=');
 
-  if (messageArray.length < 2) {
-    bot.reply(message, `The command syntax is *add-token user=token*`);
-    return;
-  }
-
   tokenManager.addToken(messageArray[0], messageArray[1]);
   bot.reply(message, `The user "${messageArray[0]}" token "${messageArray[1]}" is stored :tada::tada::tada:.`)
 });
@@ -187,7 +182,7 @@ controller.hears(['init travis'], ['direct_message', 'direct_mention', 'mention'
 
           //console.log(tokenManager.getToken())
           if (tokenManager.getToken(repoContent[0]) === null) {
-            bot.reply(message, `Sorry, but token for *${repoContent[0]}* is not found:disappointed:. You can add tokens using the \"*add-token user=token*\" command in a direct message to me. DO NOT send a token where others can see it!`);
+            bot.reply(message, `Sorry, but token for *${repoContent[0]}* is not found :disappointed:. You can add tokens using the \"*add-token user=token*\" command in a direct message to me. DO NOT send a token where others can see it!`);
             return;
           }
 
@@ -206,6 +201,7 @@ controller.hears(['init travis'], ['direct_message', 'direct_mention', 'mention'
                 }
               }, function (err) {
                 if (err || data.status == constants.ERROR) {
+                  bot.reply(message, data.message);
                   console.log(err);
                   console.log(data);
                   return
