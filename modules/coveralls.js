@@ -46,7 +46,7 @@ function getCoverageInfo(commitSHA, coverageThreshold)
 			catch(ex){
 				var resp = constant.getMessageStructure();
 				resp.status = constant.ERROR;
-				resp.message = "There was an error connecting to Coveralls";
+				resp.message = "There was an error connecting to Coveralls.\nDid you remember to enable Coveralls for your repo?\nhttps://coveralls.io/repos/new";
 				
 				resolve(resp);
 			}
